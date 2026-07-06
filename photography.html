@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Open every link in a new tab by default. -->
+  <base target="_blank" />
+  <title>Photography — Lachlan SF Chu</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="wide dark">
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html">Lachlan SF Chu</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="writing.html">Writing</a>
+      <a href="photography.html" class="current">Photography</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Photography</h1>
+
+    <!-- Buttons that switch between the two display modes. -->
+    <div class="view-toggle">
+      <button type="button" id="btn-gallery" class="toggle-btn active">Gallery</button>
+      <button type="button" id="btn-grid" class="toggle-btn">Grid</button>
+    </div>
+
+    <!-- GALLERY MODE (default): one large photo, details on one line below,
+         arrows appear on hover to move through the set. -->
+    <section id="gallery" class="gallery">
+      <button type="button" class="nav-arrow prev" id="prev" aria-label="Previous photo">&#8249;</button>
+      <div class="gallery-stage">
+        <img id="gallery-img" src="" alt="" />
+        <div id="gallery-cap" class="gallery-cap"></div>
+      </div>
+      <button type="button" class="nav-arrow next" id="next" aria-label="Next photo">&#8250;</button>
+    </section>
+
+    <!-- GRID MODE: jigsaw masonry that keeps each photo's own shape. -->
+    <section id="grid" class="grid-masonry" hidden></section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Reach me at <a href="mailto:lachlan.chu@columbia.edu">lachlan.chu@columbia.edu</a> &middot; <a href="https://www.linkedin.com/in/lachlanchu">LinkedIn</a>.</p>
+  </footer>
+
+  <script>
+    // Every photo, already ordered by location then name.
+    const photos = [
+      { src: "images/Hawk%20%7C%20Crystal%20Springs,%20CA,%20USA.jpg", name: "Hawk", loc: "Crystal Springs, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 800" },
+      { src: "images/Hawk%202%20%7C%20Crystal%20Springs,%20CA,%20USA.jpg", name: "Hawk 2", loc: "Crystal Springs, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 800" },
+      { src: "images/Jay%20%7C%20Crystal%20Springs,%20CA,%20USA.jpg", name: "Jay", loc: "Crystal Springs, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 2500" },
+      { src: "images/Plant%20%7C%20Elephant%20Mountain,%20Taipei,%20TWN.jpg", name: "Plant", loc: "Elephant Mountain, Taipei, TWN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 2000" },
+      { src: "images/Plant%202%20%7C%20Elephant%20Mountain,%20Taipei,%20TWN.jpg", name: "Plant 2", loc: "Elephant Mountain, Taipei, TWN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 2000" },
+      { src: "images/Wasp%20%7C%20Elephant%20Mountain,%20Taipei,%20TWN.jpg", name: "Wasp", loc: "Elephant Mountain, Taipei, TWN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 800" },
+      { src: "images/Fuji%20%7C%20Fujikawaguchiko,%20Yamanashi,%20JPN.jpg", name: "Fuji", loc: "Fujikawaguchiko, Yamanashi, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 320" },
+      { src: "images/Fuji%202%20%7C%20Fujikawaguchiko,%20Yamanashi,%20JPN.jpg", name: "Fuji 2", loc: "Fujikawaguchiko, Yamanashi, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 500" },
+      { src: "images/Fuji%203%20%7C%20Fujikawaguchiko,%20Yamanashi,%20JPN.jpg", name: "Fuji 3", loc: "Fujikawaguchiko, Yamanashi, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 500" },
+      { src: "images/Fuji%204%20%7C%20Fujikawaguchiko,%20Yamanashi,%20JPN.jpg", name: "Fuji 4", loc: "Fujikawaguchiko, Yamanashi, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 640" },
+      { src: "images/Seagull%20%7C%20Half%20Moon%20Bay,%20CA,%20USA.jpg", name: "Seagull", loc: "Half Moon Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 1600" },
+      { src: "images/Shore%20%7C%20Half%20Moon%20Bay,%20CA,%20USA.jpg", name: "Shore", loc: "Half Moon Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 3200" },
+      { src: "images/Tree%20%7C%20Half%20Moon%20Bay,%20CA,%20USA.jpg", name: "Tree", loc: "Half Moon Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 1600" },
+      { src: "images/Wings%20%7C%20Half%20Moon%20Bay,%20CA,%20USA.jpg", name: "Wings", loc: "Half Moon Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 2000" },
+      { src: "images/Flag%20%7C%20Hokkaido%20Shrine,%20Hokkaido,%20JPN.jpg", name: "Flag", loc: "Hokkaido Shrine, Hokkaido, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 400" },
+      { src: "images/Bird%20%7C%20Monterey%20Bay,%20CA,%20USA.jpg", name: "Bird", loc: "Monterey Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 160" },
+      { src: "images/Squirrel%20%7C%20Monterey%20Bay,%20CA,%20USA.jpg", name: "Squirrel", loc: "Monterey Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 500" },
+      { src: "images/Squirrel%202%20%7C%20Monterey%20Bay,%20CA,%20USA.jpg", name: "Squirrel 2", loc: "Monterey Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 640" },
+      { src: "images/Squirrel%203%20%7C%20Monterey%20Bay,%20CA,%20USA.jpg", name: "Squirrel 3", loc: "Monterey Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 500" },
+      { src: "images/Swan%20%7C%20Monterey%20Bay,%20CA,%20USA.jpg", name: "Swan", loc: "Monterey Bay, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 500" },
+      { src: "images/SF%20%7C%20Mt.%20Tam,%20CA,%20USA.jpg", name: "SF", loc: "Mt. Tam, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 125" },
+      { src: "images/Tam%20%7C%20Mt.%20Tam,%20CA,%20USA.jpg", name: "Tam", loc: "Mt. Tam, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 200" },
+      { src: "images/Tam%202%20%7C%20Mt.%20Tam,%20CA,%20USA.jpg", name: "Tam 2", loc: "Mt. Tam, CA, USA", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 400" },
+      { src: "images/Bridge%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Bridge", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Butler%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Butler", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Butler%202%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Butler 2", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Butler%203%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Butler 3", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Chapel%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Chapel", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 2000" },
+      { src: "images/Chapel%202%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Chapel 2", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Crane%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Crane", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Hands%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Hands", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 1000" },
+      { src: "images/Hands%202%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Hands 2", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 500" },
+      { src: "images/Ivy%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Ivy", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Lamp%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Lamp", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 500" },
+      { src: "images/Lamp%202%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Lamp 2", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 500" },
+      { src: "images/Lamp%203%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Lamp 3", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 500" },
+      { src: "images/Moynihan%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Moynihan", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Pedesphere%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Pedesphere", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 1000" },
+      { src: "images/Restaurant%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Restaurant", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO —" },
+      { src: "images/Sunset%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Sunset", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Sunset%202%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Sunset 2", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Taxi%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Taxi", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 200" },
+      { src: "images/Woman%20%7C%20New%20York,%20NY,%20USA.jpg", name: "Woman", loc: "New York, NY, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Yotei%20%7C%20Niseko,%20Hokkaido,%20JPN.jpg", name: "Yotei", loc: "Niseko, Hokkaido, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 160" },
+      { src: "images/Yotei%202%20%7C%20Niseko,%20Hokkaido,%20JPN.jpg", name: "Yotei 2", loc: "Niseko, Hokkaido, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 250" },
+      { src: "images/Yotei%203%20%7C%20Niseko,%20Hokkaido,%20JPN.jpg", name: "Yotei 3", loc: "Niseko, Hokkaido, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 200" },
+      { src: "images/SFO%20%7C%20San%20Francisco,%20CA,%20USA.jpg", name: "SFO", loc: "San Francisco, CA, USA", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+      { src: "images/Hiker%20%7C%20Sapporo,%20Hokkaido,%20JPN.jpg", name: "Hiker", loc: "Sapporo, Hokkaido, JPN", meta: "Sony a7C II &bull; Tamron 150-500mm f/5-6.7 &bull; ISO 400" },
+      { src: "images/Walkway%20%7C%20Tofino,%20BC,%20CAN.jpg", name: "Walkway", loc: "Tofino, BC, CAN", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 1000" },
+      { src: "images/Boat%20%7C%20Victoria,%20BC,%20CAN.jpg", name: "Boat", loc: "Victoria, BC, CAN", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 2500" },
+      { src: "images/Peacock%20%7C%20Victoria,%20BC,%20CAN.jpg", name: "Peacock", loc: "Victoria, BC, CAN", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 1000" },
+      { src: "images/Peacock%202%20%7C%20Victoria,%20BC,%20CAN.jpg", name: "Peacock 2", loc: "Victoria, BC, CAN", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 1000" },
+      { src: "images/Peacock%203%20%7C%20Victoria,%20BC,%20CAN.jpg", name: "Peacock 3", loc: "Victoria, BC, CAN", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 1000" },
+      { src: "images/Rock%20%7C%20Victoria,%20BC,%20CAN.jpg", name: "Rock", loc: "Victoria, BC, CAN", meta: "Sony a7C II &bull; Sigma 24-70mm f/2.8 &bull; ISO 50" },
+    ];
+
+    let current = 0;
+    let fadeTimer = null;
+    const galleryImg   = document.getElementById('gallery-img');
+    const galleryCap   = document.getElementById('gallery-cap');
+    const galleryStage = document.querySelector('.gallery-stage');
+    const gridSection  = document.getElementById('grid');
+    const gallerySection = document.getElementById('gallery');
+
+    // --- Gallery: crossfade to a photo, with its details on one line below ---
+    function renderGallery(p) {
+      galleryImg.alt = p.name;
+      galleryImg.src = p.src;
+      galleryCap.innerHTML = p.name + '&nbsp;&nbsp;|&nbsp;&nbsp;' + p.loc +
+                             '&nbsp;&nbsp;|&nbsp;&nbsp;' + p.meta;
+    }
+    function showGallery(i) {
+      current = (i + photos.length) % photos.length;   // wrap around
+      const p = photos[current];
+      galleryStage.style.opacity = 0;                  // fade the current photo out
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => {
+        renderGallery(p);
+        const reveal = () => { galleryStage.style.opacity = 1; };   // fade the new one in
+        if (galleryImg.complete) reveal();
+        else galleryImg.onload = reveal;
+      }, 220);                                          // wait out the fade-out first
+    }
+    document.getElementById('prev').addEventListener('click', () => showGallery(current - 1));
+    document.getElementById('next').addEventListener('click', () => showGallery(current + 1));
+    document.addEventListener('keydown', (e) => {
+      if (gallerySection.hidden) return;
+      if (e.key === 'ArrowLeft')  showGallery(current - 1);
+      if (e.key === 'ArrowRight') showGallery(current + 1);
+    });
+
+    // --- Grid: build the jigsaw once, with the same hover detail bar as before ---
+    photos.forEach((p, index) => {
+      const fig = document.createElement('figure');
+      fig.tabIndex = 0;
+      const img = document.createElement('img');
+      img.src = p.src; img.alt = p.name; img.loading = 'lazy';
+      const ov = document.createElement('div');
+      ov.className = 'overlay';
+      ov.innerHTML = '<div class="ov-name"></div><div class="ov-loc"></div><div class="ov-meta"></div>';
+      ov.querySelector('.ov-name').textContent = p.name;
+      ov.querySelector('.ov-loc').textContent  = p.loc;
+      ov.querySelector('.ov-meta').innerHTML    = p.meta;
+      fig.appendChild(img);
+      fig.appendChild(ov);
+      // Clicking (or pressing Enter on) a grid photo opens it in gallery mode.
+      const openInGallery = () => { setMode('gallery'); showGallery(index); window.scrollTo(0, 0); };
+      fig.addEventListener('click', openInGallery);
+      fig.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openInGallery(); }
+      });
+      gridSection.appendChild(fig);
+    });
+
+    // --- Mode switching ---
+    const btnGallery = document.getElementById('btn-gallery');
+    const btnGrid    = document.getElementById('btn-grid');
+    function setMode(mode) {
+      const galleryOn = (mode === 'gallery');
+      gallerySection.hidden = !galleryOn;
+      gridSection.hidden = galleryOn;
+      btnGallery.classList.toggle('active', galleryOn);
+      btnGrid.classList.toggle('active', !galleryOn);
+    }
+    btnGallery.addEventListener('click', () => setMode('gallery'));
+    btnGrid.addEventListener('click', () => setMode('grid'));
+
+    // Start on the first photo in gallery mode.
+    showGallery(0);
+    setMode('gallery');
+  </script>
+
+</body>
+</html>
